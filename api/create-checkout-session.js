@@ -37,7 +37,7 @@ export default async function handler(req, res) {
             product_data: {
               name: "Suscripción Voice-CV"
             },
-            unit_amount: 499 // 4,99€
+            unit_amount: 1 // 1€
           },
           quantity: 1
         }
