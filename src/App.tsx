@@ -74,7 +74,6 @@ function App() {
   const [isUsed, setIsUsed] = useState<boolean>(false); // Nuevo estado
   const [canRecord, setCanRecord] = useState<boolean>(false); // Nuevo estado
   const [checkingPayment, setCheckingPayment] = useState<boolean>(true);
-  const [buyerEmail, setBuyerEmail] = useState<string>("");
 
   // ------ Animación typing ------
   const fullTitle = "Tu currículum, dictado por voz";
@@ -214,7 +213,6 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           uid,
-          email: buyerEmail || undefined,
         }),
       });
       if (!res.ok) throw new Error("No se pudo crear la sesión de pago");
@@ -957,91 +955,102 @@ p,li{font-size:0.95rem}
           </p>
 
           {/* CTA zona */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
+          <div className="flex flex-col items-center justify-center gap-4 mt-8 w-full max-w-md mx-auto">
             {/* Sección de pago y grabación */}
             {!isPaid && (
-              <div className="space-y-4">
+              <div className="w-full space-y-4">
                 <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <Lock className="h-5 w-5 text-yellow-600" />
                   <span className="text-yellow-800 font-medium">
                     Pago único de 1 € para generar tu CV profesional
                   </span>
                 </div>
-                <div className="space-y-3">
-                  <Input
-                    type="email"
-                    placeholder="Tu email (opcional para recibo)"
-                    className="border-none focus-visible:ring-0 px-0"
-                    value={buyerEmail}
-                    onChange={(e) => setBuyerEmail(e.target.value)}
-                  />
+
+                <div className="flex flex-row gap-3">
+                  <Button
+                    onClick={startCheckout}
+                    size="lg"
+                    className="flex-1 bg-black text-white hover:bg-gray-800 rounded-full px-4 py-6"
+                  >
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Pagar acceso · 1 €
+                  </Button>
+
+                  <Button
+                    onClick={startRecording}
+                    disabled={!recognitionSupported || !canRecord}
+                    size="lg"
+                    className="flex-1 bg-black text-white hover:bg-gray-800 rounded-full px-4 py-6 disabled:opacity-50"
+                  >
+                    <Mic className="mr-2 h-5 w-5" />
+                    Pagar para grabar
+                  </Button>
                 </div>
-                <Button
-                  onClick={startCheckout}
-                  size="lg"
-                  className="bg-black text-white hover:bg-gray-800 rounded-full px-8 py-6"
-                >
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Pagar acceso · 1 €
-                </Button>
               </div>
             )}
 
             {/* Mostrar opción de volver a pagar si ya se usó el acceso */}
             {isPaid && isUsed && (
-              <div className="space-y-4">
+              <div className="w-full space-y-4">
                 <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <Info className="h-5 w-5 text-blue-600" />
                   <span className="text-blue-800 font-medium">
                     Ya has creado un CV. ¿Quieres crear otro?
                   </span>
                 </div>
-                <div className="space-y-3">
-                  <Input
-                    type="email"
-                    placeholder="Tu email (opcional para recibo)"
-                    className="border-none focus-visible:ring-0 px-0"
-                    value={buyerEmail}
-                    onChange={(e) => setBuyerEmail(e.target.value)}
-                  />
+                <div className="flex flex-row gap-3">
+                  <Button
+                    onClick={startCheckout}
+                    size="lg"
+                    className="flex-1 bg-black text-white hover:bg-gray-800 rounded-full px-4 py-6"
+                  >
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Crear otro CV · 1 €
+                  </Button>
+
+                  <Button
+                    onClick={startRecording}
+                    disabled={!recognitionSupported || !canRecord}
+                    size="lg"
+                    className="flex-1 bg-black text-white hover:bg-gray-800 rounded-full px-4 py-6 disabled:opacity-50"
+                  >
+                    <Mic className="mr-2 h-5 w-5" />
+                    Paga para crear otro CV
+                  </Button>
                 </div>
-                <Button
-                  onClick={startCheckout}
-                  size="lg"
-                  className="bg-black text-white hover:bg-gray-800 rounded-full px-8 py-6"
-                >
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Crear otro CV · 1 €
-                </Button>
               </div>
             )}
 
-            {/* Grabación */}
-            {state !== "recording" ? (
-              <Button
-                onClick={startRecording}
-                disabled={!recognitionSupported || !canRecord}
-                size="lg"
-                className="bg-black text-white hover:bg-gray-800 rounded-full px-8 py-6 disabled:opacity-50"
-              >
-                <Mic className="mr-2 h-5 w-5" />
-                {!isPaid ? "Pagar para grabar" : isUsed ? "Paga para crear otro CV" : "Comenzar grabación"}
-              </Button>
-            ) : (
-              <Button
-                onClick={stopRecording}
-                size="lg"
-                className="bg-black text-white hover:bg-gray-800 rounded-full px-8 py-6"
-              >
-                <MicOff className="mr-2 h-5 w-5" />
-                Detener y generar CV
-              </Button>
+            {/* Grabación cuando está pagado y no usado */}
+            {isPaid && !isUsed && (
+              <div className="w-full">
+                {state !== "recording" ? (
+                  <Button
+                    onClick={startRecording}
+                    disabled={!recognitionSupported || !canRecord}
+                    size="lg"
+                    className="w-full bg-black text-white hover:bg-gray-800 rounded-full px-8 py-6 disabled:opacity-50"
+                  >
+                    <Mic className="mr-2 h-5 w-5" />
+                    Comenzar grabación
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={stopRecording}
+                    size="lg"
+                    className="w-full bg-black text-white hover:bg-gray-800 rounded-full px-8 py-6"
+                  >
+                    <MicOff className="mr-2 h-5 w-5" />
+                    Detener y generar CV
+                  </Button>
+                )}
+              </div>
             )}
 
             <Button
               onClick={() => window.scrollTo({ top: innerHeight * 1.1, behavior: "smooth" })}
               variant="outline"
-              className="rounded-full px-8 py-6 border-black text-black hover:bg-gray-100"
+              className="w-full rounded-full px-8 py-6 border-black text-black hover:bg-gray-100"
             >
               <Info className="mr-2 h-5 w-5" />
               Cómo funciona
