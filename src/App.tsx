@@ -25,7 +25,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Usa .svg o .png según tu archivo real
-import Logo from "@/assets/cv-voice-white.png";
+import Logo from "/voicecv-logo-square-dark.png";
 
 interface CVData {
   personalInfo: {
